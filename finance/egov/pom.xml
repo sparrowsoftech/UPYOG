@@ -90,19 +90,19 @@
 
     <ciManagement>
         <system>Jenkins</system>
-        <url>http://ci.egovernments.org/job/eGov-Github-Master/</url>
+        <url>http://ci.egovernments.org/job/eGov-Github-Master</url>
     </ciManagement>
 
     <distributionManagement>
         <repository>
-            <id>http://nexus-repo.digit.org/nexus/content/groups/public/</id>
+            <id>http://nexus-repo.digit.org/nexus/content/groups/public</id>
             <name>eGov ERP Releases Repository</name>
-            <url>http://nexus-repo.digit.org/nexus/content/repositories/releases/</url>
+            <url>http://nexus-repo.digit.org/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>nexus-repo.digit.org</id>
             <name>eGov ERP Snapshots Repository</name>
-            <url>http://nexus-repo.digit.org/nexus/content/repositories/snapshots/</url>
+            <url>http://nexus-repo.digit.org/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -110,7 +110,7 @@
         <repository>
             <id>nexus-repo.digit.org</id>
             <name>eGov Public Repository Group</name>
-            <url>http://nexus-repo.digit.org/nexus/content/groups/public/</url>
+            <url>http://nexus-repo.digit.org/nexus/content/groups/public</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
