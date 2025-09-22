@@ -1,4 +1,4 @@
-import { Header } from "@egovernments/digit-ui-react-components";
+import { Header } from "@upyog/digit-ui-react-components";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import DesktopInbox from "../../components/inbox/DesktopInbox";
@@ -19,8 +19,8 @@ const Inbox = ({ parentRoute, businessService = "TL", initialStates = {}, filter
 
   let isMobile = window.Digit.Utils.browser.isMobile();
   let paginationParams = isMobile
-    ? { limit: 100, offset: 0, sortBy: sortParams?.[0]?.id, sortOrder: sortParams?.[0]?.desc ? "DESC" : "ASC" }
-    : { limit: pageSize, offset: pageOffset, sortBy: sortParams?.[0]?.id, sortOrder: sortParams?.[0]?.desc ? "DESC" : "ASC" };
+    ? { limit: 100, offset: 0, sortBy: sortParams?.[0]?.id, sortOrder: "DESC"  }
+    : { limit: pageSize, offset: pageOffset, sortBy: sortParams?.[0]?.id, sortOrder: "DESC" };
 
   const { isFetching, isLoading: hookLoading, searchResponseKey, data, searchFields, ...rest } = Digit.Hooks.tl.useInbox({
     tenantId,
@@ -52,7 +52,7 @@ const Inbox = ({ parentRoute, businessService = "TL", initialStates = {}, filter
     // let _new = { ...searchParams, ...filterParam };
     // if (keys_to_delete) keys_to_delete.forEach((key) => delete _new[key]);
     // delete filterParam.delete;
-    if (keys_to_delete) keys_to_delete.forEach((key) => delete _new[key]);
+    if (keys_to_delete) keys_to_delete?.forEach((key) => delete _new[key]);
     delete _new?.delete;
     delete filterParam?.delete;
     setSetSearchFieldsBackToOriginalState(true);

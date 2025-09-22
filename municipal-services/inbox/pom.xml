@@ -18,7 +18,7 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<lombok.version>1.18.8</lombok.version>
+		<lombok.version>1.18.28</lombok.version>
 	</properties>
 
 	<dependencies>
@@ -46,6 +46,12 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.cache2k</groupId>
+			<artifactId>cache2k-spring</artifactId>
+			<version>1.2.0.Final</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -135,13 +141,18 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.2.jre7</version>
+			<version>42.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.egov</groupId>
 			<artifactId>mdms-client</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.wnameless.json</groupId>
+			<artifactId>json-flattener</artifactId>
+			<version>0.12.0</version>
 		</dependency>
 
 		<dependency>

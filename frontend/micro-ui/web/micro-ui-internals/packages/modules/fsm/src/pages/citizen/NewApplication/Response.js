@@ -83,7 +83,6 @@ const Response = ({ data, onSuccess }) => {
               gender: selectGender?.code,
             },
             tenantId: city?.code,
-            additionalDetails: {},
             propertyUsage: subtype?.code,
             address: {
               tenantId: city?.code,
@@ -104,7 +103,7 @@ const Response = ({ data, onSuccess }) => {
               },
               street: street?.trim(),
               doorNo: doorNo?.trim(),
-              landmark: landmark?.trim(),
+              landmark: landmark,
               slumName: slum,
               city: city?.name,
               pincode,
@@ -136,11 +135,13 @@ const Response = ({ data, onSuccess }) => {
               propertyID : propertyID?.propertyID,
               distancefromroad : data?.roadWidth?.distancefromroad,
               roadWidth: data?.roadWidth?.roadWidth,
+              propertyID : data?.cptId?.id
             },
             advanceAmount: typeof advanceAmount === "number" ? JSON.stringify(advanceAmount) : advanceAmount,
           },
           workflow: null,
         };
+        console.log("formdata212",formdata,address,data)
         mutation.mutate(formdata, {
           onError,
           onSuccess: () => {

@@ -16,7 +16,7 @@ const UID = ({ t, config, onSelect, value, userType, formData, setError: setForm
   if (!isNaN(index)) {
     [uid, setUid] = useState(formData?.originalData?.additionalDetails?.uid || "");
   } else {
-    [uid, setUid] = useState(formData?.originalData?.additionalDetails?.uid || "");
+    [uid, setUid] = useState(formData?.originalData?.additionalDetails?.uid || formData?.uid?.uid || formData?.additionalDetails?.uid||"");
 
   }
   const [error, setError] = useState(null);
@@ -41,7 +41,7 @@ const UID = ({ t, config, onSelect, value, userType, formData, setError: setForm
   useEffect(() => {
     if (userType === "employee") {
       if (uid !== "undefined" && uid?.length === 0) setFormError(config.key, { type: "required", message: t("CORE_COMMON_REQUIRED_ERRMSG") });
-      else if (uid !== "undefined" && (!/^[0-9-]{0,15}$/.test(uid) || uid?.length !== 15)) setFormError(config.key, { type: "invalid", message: t("ERR_DEFAULT_INPUT_FIELD_MSG") });
+      else if (uid !== "undefined" && (!/^[a-zA-Z0-9-]{0,15}$/.test(uid) || uid?.length !== 15)) setFormError(config.key, { type: "invalid", message: t("ERR_DEFAULT_INPUT_FIELD_MSG") });
       else clearFormErrors(config.key);
 
       onSelect(config.key, uid);

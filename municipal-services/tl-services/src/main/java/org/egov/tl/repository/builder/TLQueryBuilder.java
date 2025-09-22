@@ -3,6 +3,7 @@ package org.egov.tl.repository.builder;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.util.TLConstants;
@@ -94,8 +95,14 @@ public class TLQueryBuilder {
 
 
         if(criteria.getAccountId()!=null){
+        	 if (criteria.getApplicationType() != null) {
+                 addClauseIfRequired(preparedStmtList, builder);
+                 builder.append("  tl.applicationtype = ? ");
+                 preparedStmtList.add(criteria.getApplicationType());
+             }
+        	
             addClauseIfRequired(preparedStmtList,builder);
-            builder.append(" tl.accountid = ? ");
+            builder.append(" (tl.accountid = ? ");
             preparedStmtList.add(criteria.getAccountId());
 
             List<String> ownerIds = criteria.getOwnerIds();
@@ -103,9 +110,12 @@ public class TLQueryBuilder {
                 builder.append(" OR (tlowner.id IN (").append(createQuery(ownerIds)).append(")");
                 addToPreparedStatement(preparedStmtList,ownerIds);
                 addBusinessServiceClause(criteria,preparedStmtList,builder);
-                builder.append(" AND tlowner.active = ? )");
+                builder.append(" AND tlowner.active = ? ))");
                 preparedStmtList.add(true);
             }            
+           
+            
+
         }
         
         else {
@@ -133,11 +143,31 @@ public class TLQueryBuilder {
             }
 
             if (criteria.getApplicationNumber() != null) {
-                List<String> applicationNumber = Arrays.asList(criteria.getApplicationNumber().split(","));
-                addClauseIfRequired(preparedStmtList, builder);
-                builder.append(" LOWER(tl.applicationnumber) IN (").append(createQuery(applicationNumber)).append(")");
-                addToPreparedStatement(preparedStmtList, applicationNumber);
+                String applicationNumberStr = criteria.getApplicationNumber().trim();
+
+                if (applicationNumberStr.contains(",")) {
+                    // Handle multiple application numbers
+                    List<String> applicationNumbers = Arrays.asList(applicationNumberStr.split(","));
+                    applicationNumbers = applicationNumbers.stream()
+                                        .map(String::trim)
+                                        .filter(s -> !s.isEmpty())
+                                        .map(String::toLowerCase)
+                                        .collect(Collectors.toList());
+
+                    addClauseIfRequired(preparedStmtList, builder);
+                    builder.append(" LOWER(tl.applicationnumber) IN (")
+                           .append(createQuery(applicationNumbers))
+                           .append(") ");
+                    addToPreparedStatement(preparedStmtList, applicationNumbers);
+                } else {
+                    // Handle single application number with LIKE
+                    String searchPattern = "%" + applicationNumberStr.toLowerCase() + "%";
+                    addClauseIfRequired(preparedStmtList, builder);
+                    builder.append(" LOWER(tl.applicationnumber) LIKE ? ");
+                    preparedStmtList.add(searchPattern);
+                }
             }
+
 
             List<String> status = criteria.getStatus();
             if (!CollectionUtils.isEmpty(status)) {

@@ -351,7 +351,7 @@ const OwnerForm1 = (_props) => {
                 control={control}
                 name={"tradeName"}
                 defaultValue={tradedetail?.tradeName}
-                rules={{ required: t("REQUIRED_FIELD"), validate: { pattern: (val) => (/^[-@.\/#&+\w\s]*$/.test(val) ? true : t("INVALID_NAME")) } }}
+                rules={{ required: t("REQUIRED_FIELD"), validate: {pattern: (val) => (/.*$/.test(val) ? true : t("INVALID_NAME")) } }}
                 render={(props) => (
                   <TextInput
                     value={props.value}
@@ -481,7 +481,7 @@ const OwnerForm1 = (_props) => {
               />
             </div>
           </LabelFieldPair>
-          <CardLabelError style={errorStyle}>{localFormState.touched.gstNo ? errors?.gstNo?.message : ""}</CardLabelError>
+          <CardLabelError style={errorStyle}>{localFormState.touched.gstNo ? errors?.gstNo?.message ? t("GST_PATTERN_ERROR") : "": ""}</CardLabelError>
           <LabelFieldPair>
             <CardLabel className="card-label-smaller">{`${t("TL_NEW_OPERATIONAL_SQ_FT_AREA_LABEL")} `}</CardLabel>
             <div className="field">
