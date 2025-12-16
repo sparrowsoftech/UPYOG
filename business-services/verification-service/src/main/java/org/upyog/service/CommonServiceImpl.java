@@ -6,12 +6,14 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.upyog.config.MainConfiguration;
 import org.upyog.config.ModuleConfig;
 import org.upyog.constants.VerificationSearchConstants;
 import org.upyog.mapper.CommonDetailsMapper;
 import org.upyog.mapper.CommonDetailsMapperFactory;
 import org.upyog.repository.ServiceRequestRepository;
 import org.upyog.web.models.CommonDetails;
+import org.upyog.web.models.ModuleSearchRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.models.coremodels.RequestInfoWrapper;
 import digit.models.coremodels.UserDetailResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.upyog.web.models.ModuleSearchRequest;
 
 @Service
 @Slf4j
@@ -40,6 +41,9 @@ public class CommonServiceImpl implements CommonService {
 	private UserService userService;
 
 	@Autowired
+	private MainConfiguration mainConfiguration;
+
+	@Autowired
 	public CommonServiceImpl(ModuleConfig moduleConfig, CommonDetailsMapperFactory mapperFactory) {
 
 		this.moduleHosts = moduleConfig.getHost();
@@ -54,6 +58,9 @@ public class CommonServiceImpl implements CommonService {
 		String moduleName = request.getModuleSearchCriteria().getModuleName();
 		String applicationNumber = request.getModuleSearchCriteria().getApplicationNumber();
 		String tenantId = request.getModuleSearchCriteria().getTenantId();
+
+		log.info("Module: {}, Host: {}, Endpoint: {}", moduleName, moduleHosts.get(moduleName), moduleEndpoints.get(moduleName));
+
 		String host = moduleHosts.get(moduleName);
 		if (host == null) {
 			throw new IllegalArgumentException("Invalid module name or host not configured: " + moduleName);
@@ -74,6 +81,8 @@ public class CommonServiceImpl implements CommonService {
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(host).append(endpoint).append("?").append(uniqueIdParam).append("=").append(applicationNumber)
 				.append("&tenantId=").append(tenantId);
+		log.info("Final URL being called: {}", urlBuilder.toString());
+
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder()
 				.requestInfo(requestInfo.getUserInfo() != null ? requestInfo : getSystemUserDetails()).build();
 
@@ -82,10 +91,12 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			log.info("urlBuilder : " + urlBuilder);
 			result = serviceRequestRepository.fetchResult(urlBuilder, requestInfoWrapper);
+			log.info("API call successful for URL: {}", urlBuilder.toString());
 			JsonNode jsonNode = objectMapper.valueToTree(result);
 			CommonDetailsMapper mapper = mapperFactory.getMapper(moduleName);
 			return mapper.mapJsonToCommonDetails(jsonNode);
 		} catch (Exception e) {
+			log.error("API call failed for URL: {}, Error: {}", urlBuilder.toString(), e.getMessage());
 			throw new CustomException("Error fetching details for module: " + moduleName, "MODULE_API_ERROR");
 		}
 	}
@@ -94,21 +105,22 @@ public class CommonServiceImpl implements CommonService {
 	 * Retrieves the system user’s RequestInfo based on a predefined system
 	 * username.
 	 * 
+	 * @param userService The UserService instance used to fetch user details.
 	 * @return A RequestInfo object containing the system user’s details.
 	 * @throws IllegalStateException if the system user is not found.
 	 */
 	private RequestInfo getSystemUserDetails() {
 		UserDetailResponse userDetailResponse = userService.searchByUserName(
-				VerificationSearchConstants.INTERNALMICROSERVICEUSER_USERNAME, VerificationSearchConstants.VS_TENANTID);
+				mainConfiguration.getInternalMicroserviceUserName(), mainConfiguration.getStateLevelTenantId());
 
 		if (userDetailResponse == null || userDetailResponse.getUser().isEmpty()) {
 			throw new IllegalStateException(
-					"SYSTEM user not found for tenant '" + VerificationSearchConstants.VS_TENANTID + "'.");
+					"SYSTEM user not found for tenant '" + mainConfiguration.getStateLevelTenantId() + "'.");
 		}
 
 		RequestInfo systemRequestInfo = RequestInfo.builder().userInfo(userDetailResponse.getUser().get(0)).build();
 
-		log.info("RequestInfo of System User: " + systemRequestInfo);
+		log.info("RequestInfo of system User: " + systemRequestInfo);
 		return systemRequestInfo;
 	}
 }
